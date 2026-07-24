@@ -1,0 +1,6 @@
+{
+    "naratix": {
+        "type": "http",
+        "url": "https://api.naratix.ai/mcp"
+    }
+}

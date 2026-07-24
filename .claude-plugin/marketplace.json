@@ -1,0 +1,21 @@
+{
+    "name": "naratix",
+    "owner": {
+        "name": "Naratix"
+    },
+    "metadata": {
+        "description": "Naratix plugins for Claude Code: set up Nara product-content generation for your shop yourself.",
+        "version": "0.1.0"
+    },
+    "plugins": [
+        {
+            "name": "naratix",
+            "description": "The Nara template wizard and the Naratix connection: interview-driven setup of description templates, title templates, and category mappings for your shop.",
+            "version": "0.1.0",
+            "author": {
+                "name": "Naratix"
+            },
+            "source": "./naratix"
+        }
+    ]
+}
