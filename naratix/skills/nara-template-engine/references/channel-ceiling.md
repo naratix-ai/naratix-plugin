@@ -25,6 +25,27 @@ Ask in this order; each answer adds the listed tags. Frame every question as "do
 
 The stored value is the flat tag list, e.g. `["p","br","h2","h3","ul","ol","li","strong","em","img"]`.
 
+## Styling — asked right after the tags, every time
+
+Tags decide *structure*; this decides whether the description can carry the brand at all. Ask it as what the customer would see:
+
+> "When you look at a competitor's description on that channel, does it look designed — brand colours, spacing, styled boxes — or is it plain text in the site's default font?"
+
+Then pin down what survives:
+
+- **`none`** — plain, unstyled. The channel strips anything decorative. (Also the answer for any plain-text-only channel.)
+- **`classes`** — the channel keeps `class` attributes and a stylesheet you supply. The common case for own webshops and PIM-driven channels.
+- **`inline`** — only `style="…"` on the elements survives; classes are stripped. Common on marketplaces that sanitise but keep inline styling.
+- **`both`** — either works; prefer classes, they keep the markup readable.
+
+If they don't know: **`none`** is the safe answer. An unstyled description renders correctly everywhere; a styled one on a stripping channel can leave visible artifacts.
+
+## Brand look — only when styling is not `none`
+
+> "How should it look? Brand colours, the feel you're after — tight and technical, or airy and premium?"
+
+One or two sentences in their words is enough; it becomes the stylesheet. Ask for a hex colour if they have one, and don't push if they don't — a neutral, well-spaced look beats a guessed brand colour.
+
 ## Image placement — only when `img` made the ceiling
 
 > "How should images appear in the description?"
@@ -47,11 +68,13 @@ Mention the safety: products with few or no images simply show fewer or none —
 
 ## Stored shape
 
-The five answers persist under exactly these names — over MCP via `save-generation-profile`, or standalone into `~/.naratix/generation-profile.json`:
+These answers persist under exactly these names — over MCP via `save-generation-profile`, or standalone into `~/.naratix/generation-profile.json`:
 
 ```json
 {
     "channel_ceiling": ["p", "br", "h2", "h3", "ul", "ol", "li", "strong", "em", "img"],
+    "styling": "classes",
+    "brand_look": "Pink accents on white, generous spacing, no heavy borders.",
     "image_placement": "interleaved",
     "brand_voice": "Warm, expert, never salesy; speaks to the reader as 'you'.",
     "audience": "Home cooks upgrading their first serious kitchen gear.",
@@ -63,4 +86,4 @@ The five answers persist under exactly these names — over MCP via `save-genera
 }
 ```
 
-`image_placement` ∈ `none | hero | interleaved | gallery | ai_decided`; `title_style.style` ∈ `keyword | natural | minimal`; `length_cap` 10–255. The save replaces the whole profile — always send all five fields, including ones the customer didn't change.
+`styling` ∈ `none | classes | inline | both`; `image_placement` ∈ `none | hero | interleaved | gallery | ai_decided`; `title_style.style` ∈ `keyword | natural | minimal`; `length_cap` 10–255. The save replaces the whole profile — always send every field, including ones the customer didn't change. `brand_look` is omitted only when `styling` is `none`.

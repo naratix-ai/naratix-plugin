@@ -1,6 +1,6 @@
 {
     "name": "naratix",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Set up Nara product-content generation for your Naratix shop: an interview-driven wizard authors description templates, title templates, and category mappings — connected to your shop or as paste-ready artifacts.",
     "author": {
         "name": "Naratix"

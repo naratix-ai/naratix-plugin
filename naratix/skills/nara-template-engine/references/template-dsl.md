@@ -16,7 +16,7 @@ Each distinct `name` becomes a required LLM response field. `name` must be word 
 
 **One placeholder per line.** The parser is greedy: two `{{…::…}}` on the same line merge into one corrupt match and the first placeholder is never filled. Put each placeholder in its own tag on its own line.
 
-**Reserved names** — never use as your own placeholder names: `product_title`, `product_images`, `image_count`, `img`.
+**Engine-reserved names** — `product_title`, `product_images`, `image_count`, `img` belong to the engine: use them only in the exact constructs this reference shows, never as content placeholders you invent guidance for (except `image_count`, whose choice the Companion Prompt guides).
 
 ## Injected values (never LLM-generated)
 
@@ -73,6 +73,54 @@ Its length follows the LLM's `image_count` too.
 - **ai_decided** — `@images({{integer::image_count}})` and a Companion Prompt line telling the LLM how to choose the count (e.g. "pick 0–4 images; skip images for accessories").
 - **none** (or no `img` in the ceiling) — no image construct at all.
 
+## Giving the template a look
+
+Classes and CSS are ordinary markup to the engine — it substitutes placeholders and passes everything else through. The template carries its own stylesheet, and that is what the description is rendered with, including in a shared preview link.
+
+Author a look only to the profile's `styling`:
+
+- **`classes`** or **`both`** — put class names in the body and ship the CSS as the template's stylesheet:
+
+```
+<h2 class="nx-headline">{{string::headline}}</h2>
+<ul class="nx-benefits">
+@foreach({{array<string>::benefits}} as $benefit)
+    <li>{!! $benefit !!}</li>
+@end
+</ul>
+```
+
+```css
+.nx-headline { font-size: 1.4rem; margin: 0 0 .5rem; }
+.nx-benefits { padding-left: 1.2rem; }
+.nx-benefits li { margin-bottom: .4rem; }
+```
+
+- **`inline`** — the same declarations go in `style` attributes and there is no stylesheet, because the channel strips the classes that would point at it.
+- **`none`** — no classes, no CSS. Bare markup is the correct output here, not a lesser one.
+
+Two rules keep the pair honest: **every class in the CSS exists in the body, and every class in the body is styled.** An unmatched class is either dead CSS or an unstyled element — both look like a mistake to the customer.
+
+Prefix class names (`nx-`) so they can't collide with the channel's own stylesheet, and style only your own classes — never bare element selectors like `h2 { … }`, which would reach outside the description on some channels.
+
+The stylesheet must be self-contained: no `@import` — the shared preview blocks external stylesheets, so an imported font or reset silently vanishes there. (`@font-face` with an `https` source does render.)
+
+**One light scheme — never `prefers-color-scheme`.** The description lives inside the merchant's page, on a background the stylesheet does not control. A media query that turns the component dark while the surrounding page stays white produces an unreadable block — observed on a real shop, and rejected by the customer on sight. Author for a light background with contrast that holds on white, and leave theming to the merchant's page.
+
+## Empty sections keep their headings
+
+The DSL has no conditional, so a section built from a loop still renders its surrounding markup when the LLM returns an empty array. A product with no attributes leaves a spec heading above an empty `<table>` — observed on a real generation, not theoretical.
+
+Put a section's heading **inside** its loop whenever the section may legitimately be empty:
+
+```
+@foreach({{array<string::label, string::value>::specs}} as $spec)
+    <tr><th>{!! $spec['label'] !!}</th><td>{!! $spec['value'] !!}</td></tr>
+@end
+```
+
+…with the `<h2>` and `<table>` only where specs are guaranteed. When they aren't, prefer a single loop that carries its own heading row, or accept that thin products show an empty block and tell the customer so. The Companion Prompt's "never invent a value" rule is what makes the array empty rather than fabricated — that's the guardrail working, not a fault.
+
 ## What silently breaks a template
 
 The engine does not validate DSL bodies — malformed constructs leak into customer-facing output as raw text. Before delivering, walk the body once against this list:
@@ -84,6 +132,7 @@ The engine does not validate DSL bodies — malformed constructs leak into custo
 5. Placeholder names with hyphens, dots, or spaces — never matched, never filled.
 6. A reserved name used as an authored placeholder.
 7. Tags outside the ceiling — the engine won't strip them; the channel will.
+8. An `array<…>` placeholder written inline, outside a loop — only strings substitute in place, so the raw placeholder text ships. Arrays exist to be looped.
 
 ## Worked example
 
@@ -105,6 +154,12 @@ Ceiling `["p","br","h2","ul","li","strong","img"]`, placement `interleaved`:
 ```
 
 Every placeholder name here (`headline`, `intro`, `image_count`, `features_title`, `features`, `closing`) must have a guidance line in the Companion Prompt.
+
+## Length and paragraph count
+
+**Length is set on the template** (`word_count`) and reaches the model as a target for the whole description.
+
+**Paragraph count is not a setting on a DSL template.** The template's old `number_of_paragraphs` field only drives the legacy Blade layouts — on a DSL body it does nothing. Structure comes from what you write: one placeholder per section, or a loop when the count should vary. To get "three paragraphs", either write three placeholders or loop over an `array<string>` and say how many items you want in the Companion Prompt. Density per section is controlled the same way — through the prompt's per-placeholder guidance, not a toggle.
 
 ## Around the body
 
