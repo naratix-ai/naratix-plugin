@@ -51,6 +51,7 @@ Images come exclusively from these two constructs. Both clamp to the images the 
 ```
 
 - `@images(3)` caps at a literal 3; `@images` alone uses every image; `@images({{integer::image_count}})` lets the LLM choose the count (guide the choice in the Companion Prompt) — the count is clamped to availability either way. This directive is the only place an `integer` placeholder belongs.
+- A leading `from,` (1-based) slices the gallery before the cap: `@images(2, 2)` shows images 2 and 3, `@images(4, {{integer::rest}})` starts at the 4th, `@images(4,)` shows everything from the 4th. A slice past the product's last image renders nothing. This is how several blocks each show a *different* run of the gallery — without it every block starts at the first image.
 - Closing tag is exactly `@endimages`.
 
 **`product_images` loop** — the injected URL array as a normal data loop, for markup that needs counters:
@@ -68,7 +69,7 @@ Its length follows the LLM's `image_count` too.
 ### Placement recipes (from the profile's `image_placement`)
 
 - **hero** — one image up top: `@images(1) <img src="{{img}}" alt=""> @endimages` right after the opening section.
-- **interleaved** — images woven between content: ONE `@images({{integer::image_count}})` block whose body wraps each image in its own break (`<div>`/`<p>` per iteration). Repeating several `@images(1)` blocks shows the *same first image* each time — one block, many iterations.
+- **interleaved** — images woven between content: ONE `@images({{integer::image_count}})` block whose body wraps each image in its own break (`<div>`/`<p>` per iteration). Repeating several `@images(1)` blocks shows the *same first image* each time — one block, many iterations. When the content between images is fixed (three authored paragraphs), use sliced blocks instead — `@images(2, 1)` after the first paragraph, `@images(3, 1)` after the second — so each slot shows the next image and disappears when the product runs out.
 - **gallery** — all images together at the end: one `@images` block whose body is a compact `<img>` row/list.
 - **ai_decided** — `@images({{integer::image_count}})` and a Companion Prompt line telling the LLM how to choose the count (e.g. "pick 0–4 images; skip images for accessories").
 - **none** (or no `img` in the ceiling) — no image construct at all.

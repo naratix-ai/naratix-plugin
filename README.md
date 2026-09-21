@@ -19,4 +19,6 @@ On first use you'll be asked to authorize the Naratix connection in your browser
 
 Just say what you want — "set up product descriptions for my shop", "our titles need to fit Allegro's 75 characters", "apply the new template to everything under Kitchen" — or run `/naratix:setup` to start from the beginning.
 
+The Naratix connection also offers three guided starts as slash commands in any AI app that shows MCP prompts: **Set up my shop**, **Set up titles** and **Check my catalogue**.
+
 Everything the wizard writes to your shop is non-destructive: updates create new versions, deletes only archive, and nothing already generated is ever lost.

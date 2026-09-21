@@ -45,6 +45,8 @@ The `/naratix:setup` command (and any "redo my setup" / "we switched marketplace
 
 Category-page and brand-page descriptions are the description branch with a different `template_type`; that reference covers them.
 
+The Naratix connection also offers three of these flows as prompts — *Set up my shop*, *Set up titles*, *Check my catalogue* — which AI apps show as slash commands. Each is a starter naming the same tools in the same order; a customer who invoked one is already in that branch, so open its reference and carry on from where the starter left them.
+
 Two things worth knowing before opening any of them:
 
 - **Writes never destroy.** Revising a template creates a copy and leaves the original untouched; archiving is a soft retirement; a template still in use refuses to archive and names the blocker. Say this when a customer hesitates to let the wizard touch their shop.
@@ -57,11 +59,11 @@ Before changing anything on a shop that has been used before, look at what is th
 - `list-templates` — every template of every kind, each row carrying its `template_type`. Pass `template_type` to narrow to one kind.
 - `get-template` — the full body of one template: the DSL, the Companion Prompt, the stylesheet. Read the existing template before revising it, or `from_template_id` carries over fields nobody has seen.
 - `get-template-mapping` — what a category stores versus what actually resolves there. See [references/branch-mapping.md](references/branch-mapping.md).
-- `list-runs` — the shop's past runs. With `kind: quality-check` it is how you find out whether a check you started has finished, since nothing is pushed back.
+- `list-runs` — the shop's past runs, and the one way to read back anything you started, since nothing is pushed back. `kind: generation` with the `run_id` a generate tool returned gives the run's status, why it failed if it did, and the finished text (a description as an excerpt beside its preview link); `kind: quality-check` does the same for a check.
 
 ## Conduct
 
 - One question at a time, in the customer's language, options spelled out — and put every interview question through the session's structured question tool (Claude Code's AskUserQuestion) whenever one is available: options as selectable choices, with the "not sure" choice wherever the walkthrough defines one. Plain chat questions are the fallback, never the preference. Technical mechanics stay behind the curtain unless asked.
 - Every MCP error message is written to be self-correcting — read it, fix the call, retry once before involving the customer.
 - **Say what a call costs before making it, never after.** Generating anything — a description, a title, SEO meta — bills one generation. A cold-start is metered LLM spend sized by the taxonomy. Quality checks and every read are free. When a tool takes a `confirm` flag, the call without it is the quote: get the number, put it to the customer, and only then confirm. "No thanks" is a normal answer.
-- **Background work reports nothing back.** Generation and quality runs return a queued status, not a result. Tell the customer it is running, then check — `get-description-status` for a description, `list-runs` for a quality run — rather than falling silent or claiming it is done.
+- **Background work reports nothing back.** Generation and quality runs return a queued status, not a result. Tell the customer it is running, then check with `list-runs` and the `run_id` the call returned — rather than falling silent or claiming it is done.
